@@ -1,0 +1,5 @@
+homepage: "https://zeroclick.ai"
+documentation: "https://zeroclick.ai/documentation-conversion-tag"
+versions:
+  - sha: 0833a601d56fffaaa9cb73970ce8eb922a5d0c79
+    changeNotes: Initial release
