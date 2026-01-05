@@ -14,7 +14,6 @@ ___INFO___
   "version": 1,
   "securityGroups": [],
   "displayName": "ZeroClick conversion tag",
-  "categories": ["AFFILIATE_MARKETING", "ADVERTISING"],
   "brand": {
     "id": "brand_dummy",
     "displayName": "",
@@ -47,12 +46,6 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "TEXT",
-    "name": "eventName",
-    "displayName": "Event Name",
-    "simpleValueType": true
-  },
-  {
-    "type": "TEXT",
     "name": "orderId",
     "displayName": "Order ID (optional)",
     "simpleValueType": true
@@ -79,6 +72,7 @@ const localStorage = require('localStorage');
 const sendPixel = require('sendPixel');
 const getTimestampMillis = require('getTimestampMillis');
 const log = require('logToConsole');
+const encodeUriComponent = require('encodeUriComponent');
 
 // Get configured pixel ID (REQUIRED)
 const pixelId = data.pixelId;
@@ -95,10 +89,10 @@ function getStoredId() {
   if (cookieValues && cookieValues.length > 0) {
     return cookieValues[0];
   }
-
+  
   const localId = localStorage.getItem('_zcId');
   if (localId) return localId;
-
+  
   return null;
 }
 
@@ -107,31 +101,27 @@ const zcId = getStoredId();
 
 // Build tracking URL with pixel ID
 let trackingUrl = 'https://mcp.zeroclick.ai/api/v1/offers/cv';
-trackingUrl = trackingUrl + '?pixel_id=' + pixelId;
+trackingUrl = trackingUrl + '?pixelId=' + encodeUriComponent(pixelId);
 
 if (zcId) {
-  trackingUrl = trackingUrl + '&zc_id=' + zcId;
-}
-
-if (data.eventName) {
-  trackingUrl = trackingUrl + '&event_name=' + data.eventName;
+  trackingUrl = trackingUrl + '&zcId=' + encodeUriComponent(zcId);
 }
 
 // Add optional conversion value
 if (data.conversionValue) {
-  trackingUrl = trackingUrl + '&conversion_value=' + data.conversionValue;
+  trackingUrl = trackingUrl + '&conversionValue=' + encodeUriComponent(data.conversionValue);
 }
 
 if (data.orderId) {
-  trackingUrl = trackingUrl + '&order_id=' + data.orderId;
+  trackingUrl = trackingUrl + '&orderId=' + encodeUriComponent(data.orderId);
 }
 
-trackingUrl = trackingUrl + '&ts=' + getTimestampMillis();
+trackingUrl = trackingUrl + '&ts=' + encodeUriComponent(getTimestampMillis());
 
 log('ZeroClick: Tracking conversion for advertiser:', pixelId);
 log('ZeroClick: Tracking conversion URL:', trackingUrl);
 
-sendPixel(trackingUrl, data.gtmOnSuccess, data.gtmOnFailure);
+sendPixel(trackingUrl);
 
 data.gtmOnSuccess();
 
@@ -292,8 +282,7 @@ scenarios:
       pixelId: 'mockstores',
       orderId: 'TEST-1234',
       conversionValue: '100.00',
-      conversionCurrency: 'USD',
-      eventName: 'Purchase complete'
+      conversionCurrency: 'USD'
     };
 
     // Test: Conversion fires when cookie exists
@@ -338,6 +327,6 @@ scenarios:
 
 ___NOTES___
 
-Created on 11/25/2025, 1:42:31 PM
+Created on 1/5/2026, 12:24:04 PM
 
 
