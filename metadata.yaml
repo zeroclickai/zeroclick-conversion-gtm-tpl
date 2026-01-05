@@ -1,5 +1,7 @@
 homepage: "https://zeroclick.ai"
 documentation: "https://zeroclick.ai/documentation-conversion-tag"
 versions:
+  - sha: c0d35fd24b7f7ad23c679c2fc79c30690998b57f
+    changeNotes: Use encodeUriComponent for URL parameters and switch to camelCase parameter names
   - sha: b4f51785a7ab6ca25741d72ddb4fa21176f34d1e
     changeNotes: Initial release
