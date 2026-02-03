@@ -42,7 +42,8 @@ ___TEMPLATE_PARAMETERS___
         ]
       }
     ],
-    "valueHint": "ZCa1b234567890c"
+    "valueHint": "Enter your ZeroClick Pixel ID",
+    "defaultValue": ""
   },
   {
     "type": "TEXT",
