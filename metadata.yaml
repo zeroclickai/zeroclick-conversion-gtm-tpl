@@ -1,6 +1,8 @@
 homepage: "https://zeroclick.ai"
 documentation: "https://zeroclick.ai/documentation-conversion-tag"
 versions:
+  - sha: f72a386e10370366845d1bcfcd648f7e7beefa03
+    changeNotes: Only fire conversion tracking when zcId is present
   - sha: 45f2dc633d7474678a36c885101ea4f963c6b107
     changeNotes: Update valueHint and add defaultValue field
   - sha: c0d35fd24b7f7ad23c679c2fc79c30690998b57f

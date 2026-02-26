@@ -99,14 +99,17 @@ function getStoredId() {
 
 const zcId = getStoredId();
 
+// Only fire conversion if zcId is present
+if (!zcId) {
+  log('ZeroClick: No zcId found, skipping conversion tracking');
+  data.gtmOnSuccess();
+  return;
+}
 
 // Build tracking URL with pixel ID
 let trackingUrl = 'https://mcp.zeroclick.ai/api/v1/offers/cv';
 trackingUrl = trackingUrl + '?pixelId=' + encodeUriComponent(pixelId);
-
-if (zcId) {
-  trackingUrl = trackingUrl + '&zcId=' + encodeUriComponent(zcId);
-}
+trackingUrl = trackingUrl + '&zcId=' + encodeUriComponent(zcId);
 
 // Add optional conversion value
 if (data.conversionValue) {
