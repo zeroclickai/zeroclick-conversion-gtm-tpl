@@ -56,12 +56,6 @@ ___TEMPLATE_PARAMETERS___
     "name": "conversionValue",
     "displayName": "Conversion Value (optional)",
     "simpleValueType": true
-  },
-  {
-    "type": "TEXT",
-    "name": "conversionCurrency",
-    "displayName": "Conversion Currency Code (optional)",
-    "simpleValueType": true
   }
 ]
 
@@ -99,17 +93,16 @@ function getStoredId() {
 
 const zcId = getStoredId();
 
-// Only fire conversion if zcId is present
 if (!zcId) {
-  log('ZeroClick: No zcId found, skipping conversion tracking');
-  data.gtmOnSuccess();
-  return;
+  log('ZeroClick: No zcId found');
 }
 
 // Build tracking URL with pixel ID
 let trackingUrl = 'https://mcp.zeroclick.ai/api/v1/offers/cv';
 trackingUrl = trackingUrl + '?pixelId=' + encodeUriComponent(pixelId);
-trackingUrl = trackingUrl + '&zcId=' + encodeUriComponent(zcId);
+if (zcId) {
+  trackingUrl = trackingUrl + '&zcId=' + encodeUriComponent(zcId);
+}
 
 // Add optional conversion value
 if (data.conversionValue) {
@@ -279,42 +272,56 @@ ___WEB_PERMISSIONS___
 ___TESTS___
 
 scenarios:
-- name: Test conversion with mock cookie
+- name: Test conversion fires with zcId from cookie
   code: |-
     const mockData = {
       // Mocked field values
-      pixelId: 'mockstores',
+      pixelId: 'ZCabcdef1234567',
       orderId: 'TEST-1234',
-      conversionValue: '100.00',
-      conversionCurrency: 'USD'
+      conversionValue: '100.00'
     };
 
     // Test: Conversion fires when cookie exists
     mock('getCookieValues', function(cookieName) {
       // getCookieValues always returns an array
       if (cookieName === '_zcId') {
-        return ['ZC-TEST'];  // Cookie exists
+        return ['ZCcookievalue001'];  // Cookie exists
       }
       return [];  // Cookie doesn't exist
+    });
+
+    mock('sendPixel', function(url) {
+      assertThat(url).contains('pixelId=ZCabcdef1234567');
+      assertThat(url).contains('zcId=ZCcookievalue001');
     });
 
     // Call runCode to run the template's code.
     runCode(mockData);
 
     // Verify that the tag finished successfully.
+    assertApi('sendPixel').wasCalled();
     assertApi('gtmOnSuccess').wasCalled();
-- name: Test minimal firing with just pixelID
+- name: Test pixel fires without zcId
   code: |-
     const mockData = {
       // Mocked field values
-      pixelId: 'mockstores-2',
+      pixelId: 'ZCabcdef1234567',
     };
 
+    mock('getCookieValues', function() {
+      return [];
+    });
+
+    mock('sendPixel', function(url) {
+      assertThat(url).contains('pixelId=ZCabcdef1234567');
+      assertThat(url).doesNotContain('zcId=');
+    });
 
     // Call runCode to run the template's code.
     runCode(mockData);
 
-    // Verify that the tag finished successfully.
+    // Verify the pixel still fires when zcId is missing.
+    assertApi('sendPixel').wasCalled();
     assertApi('gtmOnSuccess').wasCalled();
 - name: Test failed test without pixelID
   code: |-
